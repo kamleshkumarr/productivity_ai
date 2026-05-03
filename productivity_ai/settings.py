@@ -29,12 +29,7 @@ CSRF_TRUSTED_ORIGINS = [
     'https://*.onrender.com'
 ]
 
-ALLOWED_HOSTS = [
-    '.orender.com'
-    '127.0.0.1',
-    'localhost',
-    'arena-stunning-domain.ngrok-free.dev'
-]
+ALLOWED_HOSTS = ['.onrender.com']
 
 # Application definition
 
