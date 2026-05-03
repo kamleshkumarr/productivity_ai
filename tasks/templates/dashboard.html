@@ -1,0 +1,384 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+    /* ===== EXACT COLOR PALETTE ===== */
+    :root {
+        --nav-navy: #2d3381;
+        --bg-soft-grey: #f3f6f9;
+        --card-white: #ffffff;
+        --border-color: #e2e8f0;
+        --text-dark: #333333;
+        --text-muted: #666666;
+        --success-green: #48bb78;
+        --edit-blue: #4299e1;
+        --danger-red: #f56565;
+    }
+
+    body {
+        background-color: var(--bg-soft-grey);
+        color: var(--text-dark);
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+
+    .dashboard-container {
+        max-width: 1300px;
+        margin: 0 auto;
+        padding: 15px;
+        /* Reduced padding for mobile */
+    }
+
+    /* ===== RESPONSIVE NAVBAR ===== */
+    .navbar {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        background: var(--nav-navy);
+        padding: 12px 20px;
+        color: white;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+
+    .nav-brand {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 700;
+    }
+
+    .nav-user {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .btn-logout {
+        border: 1px solid white;
+        color: white;
+        padding: 5px 12px;
+        border-radius: 4px;
+        text-decoration: none;
+        font-size: 13px;
+        white-space: nowrap;
+    }
+
+    /* ===== RESPONSIVE GRID LAYOUT ===== */
+    .main-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        /* Default: Single column for mobile */
+        gap: 20px;
+    }
+
+    /* Tablet & Desktop Layout */
+    @media (min-width: 992px) {
+        .main-grid {
+            grid-template-columns: 350px 1fr;
+            /* Sidebar fixed, main content flexible */
+        }
+    }
+
+    /* ===== CARDS ===== */
+    .card {
+        background: var(--card-white);
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+    }
+
+    .card-header {
+        font-weight: 700;
+        font-size: 1.1rem;
+        margin-bottom: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    /* ===== STREAK VISUAL ===== */
+    .streak-ring {
+        width: 120px;
+        height: 120px;
+        border: 10px solid #fff5f5;
+        border-top: 10px solid #ed8936;
+        border-radius: 50%;
+        margin: 0 auto 15px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    /* ===== RESPONSIVE TABLES ===== */
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+        /* Allows horizontal scroll on very small screens */
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .task-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 300px;
+        /* Prevents total collapse */
+    }
+
+    .task-table th {
+        background: #edf2f7;
+        text-align: left;
+        padding: 10px;
+        color: var(--text-muted);
+        font-size: 11px;
+        text-transform: uppercase;
+    }
+
+    .task-table td {
+        padding: 12px 10px;
+        border-bottom: 1px solid #f0f4f8;
+        font-size: 14px;
+    }
+
+    /* ===== BUTTONS & BADGES ===== */
+    .badge {
+        padding: 3px 8px;
+        border-radius: 10px;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .badge-medium {
+        background: #feebc8;
+        color: #7b341e;
+    }
+
+    .badge-high {
+        background: #fed7d7;
+        color: #822727;
+    }
+
+    .badge-low {
+        background: #c6f6d5;
+        color: #22543d;
+    }
+
+    .btn-icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 4px;
+        color: white;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        margin-right: 2px;
+    }
+
+    .bg-green {
+        background: var(--success-green);
+    }
+
+    .bg-blue {
+        background: var(--edit-blue);
+    }
+
+    .bg-red {
+        background: var(--danger-red);
+    }
+
+    .btn-add-task {
+        background: var(--nav-navy);
+        color: white;
+        padding: 6px 10px;
+        border-radius: 4px;
+        font-size: 12px;
+        text-decoration: none;
+    }
+</style>
+
+<div class="dashboard-container">
+    <nav class="navbar">
+        <div class="nav-brand">
+            <span>🚀</span>
+            <span style="font-size: 18px;">TaskPilot</span>
+        </div>
+        <div class="nav-user">
+            <!-- <span style="font-size:13px; display:none; sm:block;">Profile ▾</span> -->
+            <span style="font-weight:600; margin-right: 10px;">
+                👤 {{ user.username }}
+            </span>
+            <a href="/accounts/logout/" class="btn-logout">Log Out</a>
+        </div>
+
+
+</div>
+</nav>
+
+<div class="main-grid">
+    <div class="side-col">
+        <div class="card">
+            <div class="card-header">Streak</div>
+            <div style="text-align: center;">
+                <div class="streak-ring">
+                    <span style="font-size: 24px; font-weight: 800;">{{ streak }} 🔥</span>
+                    <span style="font-size: 9px; color: var(--text-muted);">{{ streak }} Day Streak</span>
+                </div>
+                <p style="font-weight: 700; margin: 0; font-size: 14px;">Next Milestone: 3 Days</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">Pending Tasks</div>
+            <div class="table-responsive">
+                <table class="task-table">
+                    <thead>
+                        <tr>
+                            <th>Task</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for task in pending_tasks %}
+                        <tr>
+                            <td style="font-weight:600;">{{ task.title }}</td>
+                            <td><span class="badge badge-medium">Medium</span></td>
+                            <td>
+                                <div style="display: flex;">
+                                    <a href="{% url 'complete_task' task.id %}" class="btn-icon bg-green">✔</a>
+                                    <a href="{% url 'delete_task' task.id %}" class="btn-icon bg-red">🗑</a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">Completed Tasks</div>
+
+            <div class="table-responsive">
+                <table class="task-table">
+                    <thead>
+                        <tr>
+                            <th>Task</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for task in completed_tasks %}
+                        <tr>
+                            <td style="font-weight:600;">{{ task.title }}</td>
+
+                            <td>
+                                <span class="badge badge-low">Completed</span>
+                            </td>
+
+                            <td>
+                                <a href="{% url 'delete_task' task.id %}" class="btn-icon bg-red">🗑</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" style="text-align:center; color:gray;">
+                                No completed tasks yet
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-col">
+        <div class="card">
+            <div class="card-header">
+                All Tasks
+                <a href="{% url 'add_task' %}" class="btn-add-task">Add Task</a>
+            </div>
+            <div class="table-responsive">
+                <table class="task-table">
+                    <thead>
+                        <tr>
+                            <th>Task Name</th>
+                            <th>Difficulty</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for task in tasks %}
+                        <tr>
+                            <td style="font-weight:600;">{{ task.title }}</td>
+                            <td><span
+                                    class="badge {% if task.priority == 'High' %}badge-high{% elif task.priority == 'Medium' %}badge-medium{% else %}badge-low{% endif %}">{{task.priority }}</span></td>
+                            <td>
+                                <div style="display: flex; gap: 4px;">
+
+                                    <a href="{% url 'update_task' task.id %}" class="btn-icon bg-blue">✏</a>
+                                    <a href="{% url 'delete_task' task.id %}" class="btn-icon bg-red">🗑</a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">Productivity Overview</div>
+            <div style="position: relative; height:250px; width:100%;">
+                <canvas id="responsiveChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('responsiveChart').getContext('2d');
+
+    const blueGradient = ctx.createLinearGradient(0, 0, 0, 300);
+    blueGradient.addColorStop(0, '#2d3381');
+    blueGradient.addColorStop(1, '#63b3ed');
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Done', 'Pending'],
+            datasets: [{
+                data: [{{ completed_tasks| length }}, {{ pending_tasks| length }}],
+        backgroundColor: [blueGradient, '#cbd5e0'],
+        borderRadius: 5,
+        barThickness: 'flex',
+        maxBarThickness: 80
+            }]
+        },
+        options: {
+        maintainAspectRatio: false,
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+            y: { beginAtZero: true, grid: { color: '#f0f0f0' } },
+            x: { grid: { display: false } }
+        }
+    }
+    });
+
+
+
+
+</script>
+
+{% endblock %}

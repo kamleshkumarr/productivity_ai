@@ -1,0 +1,1 @@
+web: gunicorn productivity_ai.wsgi:application
